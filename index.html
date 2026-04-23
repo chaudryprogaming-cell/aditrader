@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CryptoPro Dashboard</title>
+<title>Crypto Pro Live</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial;
-  background:linear-gradient(120deg,#0b0f19,#111a2e);
+  background:#0b0f19;
   color:white;
 }
 
 header{
   padding:20px;
   text-align:center;
+  font-size:24px;
   background:#0f172a;
-  font-size:22px;
-  font-weight:bold;
   color:#00ff99;
+  font-weight:bold;
 }
 
 .container{
@@ -31,73 +31,87 @@ header{
 
 .card{
   background:#111a2e;
-  padding:20px;
   margin:10px;
+  padding:20px;
+  width:220px;
   border-radius:12px;
-  width:200px;
   text-align:center;
-  box-shadow:0 0 15px rgba(0,255,153,0.15);
+  box-shadow:0 0 15px rgba(0,255,153,0.1);
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:scale(1.05);
 }
 
 .price{
-  font-size:20px;
+  font-size:22px;
   margin-top:10px;
   color:#00ff99;
 }
 
-footer{
-  text-align:center;
-  margin-top:40px;
-  opacity:0.5;
+.change{
+  margin-top:5px;
   font-size:14px;
 }
+
+.up{color:#00ff99;}
+.down{color:#ff4d4d;}
+
 </style>
 </head>
 
 <body>
 
-<header>🚀 CryptoPro Live Dashboard</header>
+<header>🚀 Crypto Live Trading Dashboard</header>
 
 <div class="container">
 
   <div class="card">
     <h3>Bitcoin</h3>
     <div class="price" id="btc">Loading...</div>
+    <div class="change" id="btcChange"></div>
   </div>
 
   <div class="card">
     <h3>Ethereum</h3>
     <div class="price" id="eth">Loading...</div>
+    <div class="change" id="ethChange"></div>
   </div>
 
   <div class="card">
     <h3>Solana</h3>
     <div class="price" id="sol">Loading...</div>
-  </div>
-
-  <div class="card">
-    <h3>BNB</h3>
-    <div class="price" id="bnb">Loading...</div>
+    <div class="change" id="solChange"></div>
   </div>
 
 </div>
 
-<footer>Live Crypto Prices (Demo API) • CryptoPro</footer>
-
 <script>
-// simple live crypto API (CoinGecko)
-async function loadPrices(){
-  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin&vs_currencies=usd");
-  const data = await res.json();
+async function load(){
+  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true");
+  const d = await res.json();
 
-  document.getElementById("btc").innerText = "$" + data.bitcoin.usd;
-  document.getElementById("eth").innerText = "$" + data.ethereum.usd;
-  document.getElementById("sol").innerText = "$" + data.solana.usd;
-  document.getElementById("bnb").innerText = "$" + data.binancecoin.usd;
+  function set(id, price, change){
+    document.getElementById(id).innerText = "$" + price.toFixed(2);
+
+    let c = document.getElementById(id+"Change");
+    c.innerText = change.toFixed(2) + "% (24h)";
+
+    if(change >= 0){
+      c.className = "change up";
+    }else{
+      c.className = "change down";
+    }
+  }
+
+  set("btc", d.bitcoin.usd, d.bitcoin.usd_24h_change);
+  set("eth", d.ethereum.usd, d.ethereum.usd_24h_change);
+  set("sol", d.solana.usd, d.solana.usd_24h_change);
 }
 
-loadPrices();
-setInterval(loadPrices, 10000);
+load();
+setInterval(load, 8000);
 </script>
 
 </body>
