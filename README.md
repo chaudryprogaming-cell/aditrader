@@ -1,2 +1,18 @@
-# aditrader
-“A responsive cryptocurrency trading platform website featuring real-time UI, charts, and modern design.”
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CryptoX</title>
+</head>
+<body style="background:#0b0f19;color:white;text-align:center;font-family:Arial;">
+
+<h1>Crypto Trading Platform</h1>
+<p>Welcome to CryptoX Dashboard</p>
+
+<div>
+  <h2>Bitcoin: $64,000</h2>
+  <h2>Ethereum: $3,200</h2>
+</div>
+
+</body>
+</html>
