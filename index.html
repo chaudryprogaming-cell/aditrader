@@ -38,7 +38,6 @@ header{
   width:200px;
   border-radius:12px;
   text-align:center;
-  box-shadow:0 0 15px rgba(0,255,153,0.1);
 }
 
 .price{
@@ -86,7 +85,7 @@ header{
 <div id="chart"></div>
 
 <script>
-// ===================== PRICE API =====================
+// ================= PRICE =================
 async function load(){
   const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true");
   const d = await res.json();
@@ -96,7 +95,6 @@ async function load(){
 
     let c = document.getElementById(id+"Change");
     c.innerText = change.toFixed(2) + "% (24h)";
-
     c.className = change >= 0 ? "change up" : "change down";
   }
 
@@ -108,43 +106,54 @@ async function load(){
 load();
 setInterval(load, 5000);
 
-// ===================== CANDLE CHART =====================
+// ================= CHART FIX =================
 const chart = LightweightCharts.createChart(document.getElementById('chart'), {
-    layout: {
-        background: { color: '#0b0f19' },
-        textColor: '#fff',
-    },
-    grid: {
-        vertLines: { color: '#1f2937' },
-        horzLines: { color: '#1f2937' },
-    },
+  layout: {
+    background: { color: '#0b0f19' },
+    textColor: '#ffffff',
+  },
+  grid: {
+    vertLines: { color: '#1f2937' },
+    horzLines: { color: '#1f2937' },
+  },
+  timeScale: {
+    timeVisible: true,
+    secondsVisible: false,
+  }
 });
 
-const candleSeries = chart.addCandlestickSeries();
+// ✅ FIX: correct modern API
+const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
 
+// initial data
 let data = [
-    { time: '2024-01-01', open: 42000, high: 43000, low: 41000, close: 42500 },
-    { time: '2024-01-02', open: 42500, high: 44000, low: 42000, close: 43800 },
-    { time: '2024-01-03', open: 43800, high: 45000, low: 43000, close: 43500 },
-    { time: '2024-01-04', open: 43500, high: 46000, low: 43000, close: 45500 },
+  { time: 1704067200, open: 42000, high: 43000, low: 41000, close: 42500 },
+  { time: 1704153600, open: 42500, high: 44000, low: 42000, close: 43800 },
+  { time: 1704240000, open: 43800, high: 45000, low: 43000, close: 43500 },
+  { time: 1704326400, open: 43500, high: 46000, low: 43000, close: 45500 },
 ];
 
 candleSeries.setData(data);
 
-// fake live update
+// live fake movement
 setInterval(() => {
-    let last = data[data.length - 1];
-    let newClose = last.close + (Math.random() * 800 - 400);
+  let last = data[data.length - 1];
+  let newClose = last.close + (Math.random() * 600 - 300);
 
-    let newCandle = {
-        time: last.time,
-        open: last.open,
-        high: Math.max(last.high, newClose),
-        low: Math.min(last.low, newClose),
-        close: newClose
-    };
+  let candle = {
+    time: last.time + 86400,
+    open: last.close,
+    high: Math.max(last.close, newClose),
+    low: Math.min(last.close, newClose),
+    close: newClose
+  };
 
-    candleSeries.update(newCandle);
+  data.push(candle);
+
+  if (data.length > 30) data.shift();
+
+  candleSeries.setData(data);
+
 }, 3000);
 
 </script>
