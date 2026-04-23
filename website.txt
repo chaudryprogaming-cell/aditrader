@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CryptoX - Trading Platform</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0f19;
+      color: white;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 50px;
+      background: #0f1629;
+      align-items: center;
+    }
+
+    header h1 {
+      color: #00ff99;
+      font-size: 22px;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      opacity: 0.8;
+    }
+
+    nav a:hover {
+      color: #00ff99;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .hero h2 {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      opacity: 0.7;
+    }
+
+    .btn {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #00ff99;
+      border: none;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .coins {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 50px 0;
+    }
+
+    .card {
+      background: #111a2e;
+      padding: 20px;
+      margin: 10px;
+      border-radius: 10px;
+      width: 180px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,255,153,0.2);
+    }
+
+    .card h3 {
+      color: #00ff99;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      opacity: 0.5;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>CryptoX</h1>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Markets</a>
+    <a href="#">Trade</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Trade Crypto Like a Pro</h2>
+  <p>Fast, secure and modern crypto trading platform UI</p>
+  <button class="btn">Start Trading</button>
+</section>
+
+<section class="coins">
+  <div class="card">
+    <h3>Bitcoin</h3>
+    <p>$64,000</p>
+  </div>
+
+  <div class="card">
+    <h3>Ethereum</h3>
+    <p>$3,200</p>
+  </div>
+
+  <div class="card">
+    <h3>Solana</h3>
+    <p>$145</p>
+  </div>
+
+  <div class="card">
+    <h3>BNB</h3>
+    <p>$580</p>
+  </div>
+</section>
+
+<footer>
+  © 2026 CryptoX. All rights reserved.
+</footer>
+
+</body>
+</html>
