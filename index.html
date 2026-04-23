@@ -86,21 +86,32 @@ header{
   </div>
 
 </div>
-
 <script>
 async function load(){
   const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true");
   const d = await res.json();
 
   function set(id, price, change){
-    document.getElementById(id).innerText = "$" + price.toFixed(2);
+    let el = document.getElementById(id);
+
+    let old = el.innerText;
+    let newPrice = "$" + price.toFixed(2);
+
+    // 🔥 flash effect (live feel)
+    if(old !== newPrice){
+      el.style.transform = "scale(1.2)";
+      el.style.transition = "0.2s";
+      setTimeout(()=> el.style.transform = "scale(1)", 200);
+    }
+
+    el.innerText = newPrice;
 
     let c = document.getElementById(id+"Change");
     c.innerText = change.toFixed(2) + "% (24h)";
 
     if(change >= 0){
       c.className = "change up";
-    }else{
+    } else {
       c.className = "change down";
     }
   }
@@ -111,8 +122,5 @@ async function load(){
 }
 
 load();
-setInterval(load, 8000);
+setInterval(load, 5000);
 </script>
-
-</body>
-</html>
