@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crypto Pro Live</title>
+<title>Crypto Pro Dashboard</title>
+
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 
 <style>
 body{
-  <div id="chart" style="height:400px; margin:20px;"></div>margin:0;
+  margin:0;
   font-family:Arial;
   background:#0b0f19;
   color:white;
 }
 
 header{
-  padding:20px;
   text-align:center;
+  padding:20px;
   font-size:24px;
   background:#0f172a;
   color:#00ff99;
@@ -26,22 +28,17 @@ header{
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
-  margin-top:30px;
+  margin-top:20px;
 }
 
 .card{
   background:#111a2e;
   margin:10px;
   padding:20px;
-  width:220px;
+  width:200px;
   border-radius:12px;
   text-align:center;
   box-shadow:0 0 15px rgba(0,255,153,0.1);
-  transition:0.3s;
-}
-
-.card:hover{
-  transform:scale(1.05);
 }
 
 .price{
@@ -50,20 +47,19 @@ header{
   color:#00ff99;
 }
 
-.change{
-  margin-top:5px;
-  font-size:14px;
+.change.up{color:#00ff99;}
+.change.down{color:#ff4d4d;}
+
+#chart{
+  height:400px;
+  margin:30px;
 }
-
-.up{color:#00ff99;}
-.down{color:#ff4d4d;}
-
 </style>
 </head>
 
 <body>
 
-<header>🚀 Crypto Live Trading Dashboard</header>
+<header>🚀 Crypto Pro Live Dashboard</header>
 
 <div class="container">
 
@@ -86,34 +82,22 @@ header{
   </div>
 
 </div>
+
+<div id="chart"></div>
+
 <script>
+// ===================== PRICE API =====================
 async function load(){
   const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true");
   const d = await res.json();
 
   function set(id, price, change){
-    let el = document.getElementById(id);
-
-    let old = el.innerText;
-    let newPrice = "$" + price.toFixed(2);
-
-    // 🔥 flash effect (live feel)
-    if(old !== newPrice){
-      el.style.transform = "scale(1.2)";
-      el.style.transition = "0.2s";
-      setTimeout(()=> el.style.transform = "scale(1)", 200);
-    }
-
-    el.innerText = newPrice;
+    document.getElementById(id).innerText = "$" + price.toFixed(2);
 
     let c = document.getElementById(id+"Change");
     c.innerText = change.toFixed(2) + "% (24h)";
 
-    if(change >= 0){
-      c.className = "change up";
-    } else {
-      c.className = "change down";
-    }
+    c.className = change >= 0 ? "change up" : "change down";
   }
 
   set("btc", d.bitcoin.usd, d.bitcoin.usd_24h_change);
@@ -123,45 +107,47 @@ async function load(){
 
 load();
 setInterval(load, 5000);
-</script><script>
+
+// ===================== CANDLE CHART =====================
 const chart = LightweightCharts.createChart(document.getElementById('chart'), {
     layout: {
         background: { color: '#0b0f19' },
-        textColor: '#ffffff',
+        textColor: '#fff',
     },
     grid: {
         vertLines: { color: '#1f2937' },
         horzLines: { color: '#1f2937' },
     },
-    timeScale: {
-        timeVisible: true,
-        secondsVisible: false,
-    },
 });
 
 const candleSeries = chart.addCandlestickSeries();
 
-// 🔥 sample live-like data (you can replace with real API later)
-candleSeries.setData([
+let data = [
     { time: '2024-01-01', open: 42000, high: 43000, low: 41000, close: 42500 },
     { time: '2024-01-02', open: 42500, high: 44000, low: 42000, close: 43800 },
     { time: '2024-01-03', open: 43800, high: 45000, low: 43000, close: 43500 },
     { time: '2024-01-04', open: 43500, high: 46000, low: 43000, close: 45500 },
-    { time: '2024-01-05', open: 45500, high: 47000, low: 44000, close: 46500 },
-]);
+];
 
-// 🔥 fake live update every 3 sec
+candleSeries.setData(data);
+
+// fake live update
 setInterval(() => {
-    const last = candleSeries._data[candleSeries._data.length - 1];
-    const newClose = last.close + (Math.random() * 1000 - 500);
+    let last = data[data.length - 1];
+    let newClose = last.close + (Math.random() * 800 - 400);
 
-    candleSeries.update({
+    let newCandle = {
         time: last.time,
         open: last.open,
         high: Math.max(last.high, newClose),
         low: Math.min(last.low, newClose),
         close: newClose
-    });
+    };
+
+    candleSeries.update(newCandle);
 }, 3000);
 
 </script>
+
+</body>
+</html>
