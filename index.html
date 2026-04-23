@@ -1,15 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CryptoX</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoPro Dashboard</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(120deg,#0b0f19,#111a2e);
+  color:white;
+}
+
+header{
+  padding:20px;
+  text-align:center;
+  background:#0f172a;
+  font-size:22px;
+  font-weight:bold;
+  color:#00ff99;
+}
+
+.container{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:30px;
+}
+
+.card{
+  background:#111a2e;
+  padding:20px;
+  margin:10px;
+  border-radius:12px;
+  width:200px;
+  text-align:center;
+  box-shadow:0 0 15px rgba(0,255,153,0.15);
+}
+
+.price{
+  font-size:20px;
+  margin-top:10px;
+  color:#00ff99;
+}
+
+footer{
+  text-align:center;
+  margin-top:40px;
+  opacity:0.5;
+  font-size:14px;
+}
+</style>
 </head>
-<body style="background:#0b0f19;color:white;text-align:center;font-family:Arial;">
 
-<h1>Crypto Trading Platform</h1>
-<p>Welcome to your Crypto Dashboard</p>
+<body>
 
-<h2>Bitcoin: $64,000</h2>
-<h2>Ethereum: $3,200</h2>
+<header>🚀 CryptoPro Live Dashboard</header>
+
+<div class="container">
+
+  <div class="card">
+    <h3>Bitcoin</h3>
+    <div class="price" id="btc">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h3>Ethereum</h3>
+    <div class="price" id="eth">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h3>Solana</h3>
+    <div class="price" id="sol">Loading...</div>
+  </div>
+
+  <div class="card">
+    <h3>BNB</h3>
+    <div class="price" id="bnb">Loading...</div>
+  </div>
+
+</div>
+
+<footer>Live Crypto Prices (Demo API) • CryptoPro</footer>
+
+<script>
+// simple live crypto API (CoinGecko)
+async function loadPrices(){
+  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin&vs_currencies=usd");
+  const data = await res.json();
+
+  document.getElementById("btc").innerText = "$" + data.bitcoin.usd;
+  document.getElementById("eth").innerText = "$" + data.ethereum.usd;
+  document.getElementById("sol").innerText = "$" + data.solana.usd;
+  document.getElementById("bnb").innerText = "$" + data.binancecoin.usd;
+}
+
+loadPrices();
+setInterval(loadPrices, 10000);
+</script>
 
 </body>
 </html>
