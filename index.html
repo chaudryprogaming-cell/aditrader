@@ -123,4 +123,45 @@ async function load(){
 
 load();
 setInterval(load, 5000);
+</script><script>
+const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+    layout: {
+        background: { color: '#0b0f19' },
+        textColor: '#ffffff',
+    },
+    grid: {
+        vertLines: { color: '#1f2937' },
+        horzLines: { color: '#1f2937' },
+    },
+    timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+    },
+});
+
+const candleSeries = chart.addCandlestickSeries();
+
+// 🔥 sample live-like data (you can replace with real API later)
+candleSeries.setData([
+    { time: '2024-01-01', open: 42000, high: 43000, low: 41000, close: 42500 },
+    { time: '2024-01-02', open: 42500, high: 44000, low: 42000, close: 43800 },
+    { time: '2024-01-03', open: 43800, high: 45000, low: 43000, close: 43500 },
+    { time: '2024-01-04', open: 43500, high: 46000, low: 43000, close: 45500 },
+    { time: '2024-01-05', open: 45500, high: 47000, low: 44000, close: 46500 },
+]);
+
+// 🔥 fake live update every 3 sec
+setInterval(() => {
+    const last = candleSeries._data[candleSeries._data.length - 1];
+    const newClose = last.close + (Math.random() * 1000 - 500);
+
+    candleSeries.update({
+        time: last.time,
+        open: last.open,
+        high: Math.max(last.high, newClose),
+        low: Math.min(last.low, newClose),
+        close: newClose
+    });
+}, 3000);
+
 </script>
