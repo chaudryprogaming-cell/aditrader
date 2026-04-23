@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crypto Pro Live</title>
+<title>Crypto Pro Binance Level</title>
 
 <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 
@@ -27,7 +27,6 @@ header{
 .container{
   display:flex;
   justify-content:center;
-  flex-wrap:wrap;
   margin-top:20px;
 }
 
@@ -42,15 +41,11 @@ header{
 
 .price{
   font-size:22px;
-  margin-top:10px;
   color:#00ff99;
 }
 
-.change.up{color:#00ff99;}
-.change.down{color:#ff4d4d;}
-
 #chart{
-  height:420px;
+  height:450px;
   margin:30px;
 }
 </style>
@@ -58,42 +53,30 @@ header{
 
 <body>
 
-<header>🚀 Crypto Live Binance-Style Dashboard</header>
+<header>🚀 Binance-Level Live Crypto Chart</header>
 
 <div class="container">
-
   <div class="card">
     <h3>Bitcoin</h3>
     <div class="price" id="btc">Loading...</div>
   </div>
-
-  <div class="card">
-    <h3>Ethereum</h3>
-    <div class="price" id="eth">Loading...</div>
-  </div>
-
 </div>
 
 <div id="chart"></div>
 
 <script>
 
-// ================= LIVE PRICE =================
+// ================= PRICE FEED =================
 let btcPrice = 43000;
 
-// update price every 3 sec
 setInterval(async () => {
-  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
+  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
   const d = await res.json();
-
   btcPrice = d.bitcoin.usd;
-
-  document.getElementById("btc").innerText = "$" + d.bitcoin.usd;
-  document.getElementById("eth").innerText = "$" + d.ethereum.usd;
+  document.getElementById("btc").innerText = "$" + btcPrice;
 }, 3000);
 
-
-// ================= BINANCE STYLE CHART =================
+// ================= CHART =================
 const chart = LightweightCharts.createChart(document.getElementById('chart'), {
   layout: {
     background: { color: '#0b0f19' },
@@ -109,50 +92,71 @@ const chart = LightweightCharts.createChart(document.getElementById('chart'), {
   }
 });
 
-// NEW API STYLE (correct)
 const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
 
-// start with current time
-let time = Math.floor(Date.now() / 1000);
+// ================= REAL BINANCE LOGIC =================
 
-// initial candle
-let last = {
-  time: time,
+// current candle bucket (1 minute)
+let currentMinute = Math.floor(Date.now() / 60000);
+
+let candle = {
+  time: currentMinute * 60,
   open: btcPrice,
   high: btcPrice,
   low: btcPrice,
   close: btcPrice
 };
 
-let candles = [last];
+let candles = [];
+candles.push(candle);
 
 candleSeries.setData(candles);
 
-// ================= LIVE CANDLE ENGINE =================
+// ================= LIVE ENGINE =================
 setInterval(() => {
 
-  let change = (Math.random() - 0.5) * 200;
-  let newPrice = btcPrice + change;
+  let nowMinute = Math.floor(Date.now() / 60000);
 
-  let newCandle = {
-    time: Math.floor(Date.now() / 1000),
-    open: last.close,
-    high: Math.max(last.close, newPrice),
-    low: Math.min(last.close, newPrice),
-    close: newPrice
-  };
+  // 🔥 SAME MINUTE → update candle
+  if(nowMinute === currentMinute){
 
-  candles.push(newCandle);
+    let change = (Math.random() - 0.5) * 200;
+    let newPrice = btcPrice + change;
 
-  if(candles.length > 40){
-    candles.shift();
+    candle.close = newPrice;
+    candle.high = Math.max(candle.high, newPrice);
+    candle.low = Math.min(candle.low, newPrice);
+
+    candles[candles.length - 1] = candle;
+
+    candleSeries.setData(candles);
+
   }
 
-  candleSeries.setData(candles);
+  // 🔥 NEW MINUTE → new candle
+  else{
 
-  last = newCandle;
+    currentMinute = nowMinute;
 
-}, 2000);
+    let newCandle = {
+      time: currentMinute * 60,
+      open: candle.close,
+      high: candle.close,
+      low: candle.close,
+      close: candle.close
+    };
+
+    candle = newCandle;
+    candles.push(newCandle);
+
+    if(candles.length > 60){
+      candles.shift();
+    }
+
+    candleSeries.setData(candles);
+  }
+
+}, 1000);
 
 </script>
 
