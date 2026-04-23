@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crypto Pro Dashboard</title>
+<title>Crypto Pro Live</title>
 
 <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 
@@ -26,8 +26,8 @@ header{
 
 .container{
   display:flex;
-  flex-wrap:wrap;
   justify-content:center;
+  flex-wrap:wrap;
   margin-top:20px;
 }
 
@@ -50,7 +50,7 @@ header{
 .change.down{color:#ff4d4d;}
 
 #chart{
-  height:400px;
+  height:420px;
   margin:30px;
 }
 </style>
@@ -58,26 +58,18 @@ header{
 
 <body>
 
-<header>🚀 Crypto Pro Live Dashboard</header>
+<header>🚀 Crypto Live Binance-Style Dashboard</header>
 
 <div class="container">
 
   <div class="card">
     <h3>Bitcoin</h3>
     <div class="price" id="btc">Loading...</div>
-    <div class="change" id="btcChange"></div>
   </div>
 
   <div class="card">
     <h3>Ethereum</h3>
     <div class="price" id="eth">Loading...</div>
-    <div class="change" id="ethChange"></div>
-  </div>
-
-  <div class="card">
-    <h3>Solana</h3>
-    <div class="price" id="sol">Loading...</div>
-    <div class="change" id="solChange"></div>
   </div>
 
 </div>
@@ -85,32 +77,27 @@ header{
 <div id="chart"></div>
 
 <script>
-// ================= PRICE =================
-async function load(){
-  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true");
+
+// ================= LIVE PRICE =================
+let btcPrice = 43000;
+
+// update price every 3 sec
+setInterval(async () => {
+  const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
   const d = await res.json();
 
-  function set(id, price, change){
-    document.getElementById(id).innerText = "$" + price.toFixed(2);
+  btcPrice = d.bitcoin.usd;
 
-    let c = document.getElementById(id+"Change");
-    c.innerText = change.toFixed(2) + "% (24h)";
-    c.className = change >= 0 ? "change up" : "change down";
-  }
+  document.getElementById("btc").innerText = "$" + d.bitcoin.usd;
+  document.getElementById("eth").innerText = "$" + d.ethereum.usd;
+}, 3000);
 
-  set("btc", d.bitcoin.usd, d.bitcoin.usd_24h_change);
-  set("eth", d.ethereum.usd, d.ethereum.usd_24h_change);
-  set("sol", d.solana.usd, d.solana.usd_24h_change);
-}
 
-load();
-setInterval(load, 5000);
-
-// ================= CHART FIX =================
+// ================= BINANCE STYLE CHART =================
 const chart = LightweightCharts.createChart(document.getElementById('chart'), {
   layout: {
     background: { color: '#0b0f19' },
-    textColor: '#ffffff',
+    textColor: '#fff',
   },
   grid: {
     vertLines: { color: '#1f2937' },
@@ -118,43 +105,54 @@ const chart = LightweightCharts.createChart(document.getElementById('chart'), {
   },
   timeScale: {
     timeVisible: true,
-    secondsVisible: false,
+    secondsVisible: true
   }
 });
 
-// ✅ FIX: correct modern API
+// NEW API STYLE (correct)
 const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries);
 
-// initial data
-let data = [
-  { time: 1704067200, open: 42000, high: 43000, low: 41000, close: 42500 },
-  { time: 1704153600, open: 42500, high: 44000, low: 42000, close: 43800 },
-  { time: 1704240000, open: 43800, high: 45000, low: 43000, close: 43500 },
-  { time: 1704326400, open: 43500, high: 46000, low: 43000, close: 45500 },
-];
+// start with current time
+let time = Math.floor(Date.now() / 1000);
 
-candleSeries.setData(data);
+// initial candle
+let last = {
+  time: time,
+  open: btcPrice,
+  high: btcPrice,
+  low: btcPrice,
+  close: btcPrice
+};
 
-// live fake movement
+let candles = [last];
+
+candleSeries.setData(candles);
+
+// ================= LIVE CANDLE ENGINE =================
 setInterval(() => {
-  let last = data[data.length - 1];
-  let newClose = last.close + (Math.random() * 600 - 300);
 
-  let candle = {
-    time: last.time + 86400,
+  let change = (Math.random() - 0.5) * 200;
+  let newPrice = btcPrice + change;
+
+  let newCandle = {
+    time: Math.floor(Date.now() / 1000),
     open: last.close,
-    high: Math.max(last.close, newClose),
-    low: Math.min(last.close, newClose),
-    close: newClose
+    high: Math.max(last.close, newPrice),
+    low: Math.min(last.close, newPrice),
+    close: newPrice
   };
 
-  data.push(candle);
+  candles.push(newCandle);
 
-  if (data.length > 30) data.shift();
+  if(candles.length > 40){
+    candles.shift();
+  }
 
-  candleSeries.setData(data);
+  candleSeries.setData(candles);
 
-}, 3000);
+  last = newCandle;
+
+}, 2000);
 
 </script>
 
